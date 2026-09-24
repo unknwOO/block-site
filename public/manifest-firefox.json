@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Block Site",
+  "description": "Blocks access to distracting websites to improve your productivity.",
+  "version": "8.2.1",
+  "icons": {
+    "32": "icon_32.png",
+    "128": "icon_128.png"
+  },
+  "action": {
+    "default_icon": {
+      "32": "icon_32.png",
+      "128": "icon_128.png"
+    }
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "permissions": [
+    "storage",
+    "tabs",
+    "webNavigation",
+    "contextMenus"
+  ],
+  "background": {
+    "scripts": ["background.mjs"],
+    "type": "module"
+  },
+  "incognito": "spanning",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{5D2A6F66-7AC0-6750-AFBA-1DA7C98A3086}"
+    }
+  }
+}
