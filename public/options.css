@@ -11,22 +11,52 @@ body:not(.counter-show) #counter-period-option {
   display: none;
 }
 
-#blocked-container {
+#content-tabs {
   display: flex;
-  flex-direction: column;
-  margin: 1em 0 2em 0;
+  margin-top: 1em;
 }
 
-#blocked-container > div {
+.content-tab {
   align-self: flex-start;
+  border: 3px solid var(--border-color);
+  border-bottom: none;
   border-radius: var(--border-radius) var(--border-radius) 0 0;
-  background: var(--border-color);
-  color: var(--input-background-color);
+  background: var(--input-background-color);
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: inherit;
   font-weight: bold;
   padding: .25em .5em;
 }
 
-#blocked-list {
+.content-tab + .content-tab {
+  border-left: none;
+  border-top-left-radius: 0;
+}
+
+.content-tab:not(:last-child) {
+  border-top-right-radius: 0;
+}
+
+.content-tab.active {
+  background: var(--border-color);
+  color: var(--input-background-color);
+}
+
+.content-panel {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 2em 0;
+  width: 100%;
+  max-width: 1100px;
+}
+
+.content-panel[hidden] {
+  display: none;
+}
+
+#blocked-list,
+#schedule-rules {
   border-radius: 0 var(--border-radius) var(--border-radius) var(--border-radius);
   border: 3px solid var(--border-color);
   background-color: var(--input-background-color);
@@ -38,13 +68,49 @@ body:not(.counter-show) #counter-period-option {
   white-space: pre;
   box-sizing: border-box;
   width: 100%;
-  max-width: 1100px;
   height: 400px;
   padding: .5em .75em;
   margin: 0;
 }
 
-#blocked-list::placeholder {
+#schedule-editor {
+  position: relative;
+  width: 100%;
+  height: 400px;
+}
+
+#schedule-rules {
+  position: relative;
+  z-index: 1;
+  background-color: transparent;
+  color: transparent;
+  caret-color: var(--text-color);
+  font-family: monospace;
+}
+
+#schedule-highlight {
+  position: absolute;
+  z-index: 0;
+  inset: 3px;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: 0;
+  padding: .5em .75em;
+  background-color: var(--input-background-color);
+  color: var(--text-color);
+  font-family: monospace;
+  font-size: inherit;
+  line-height: inherit;
+  pointer-events: none;
+  white-space: pre;
+}
+
+#schedule-highlight .invalid {
+  color: red;
+}
+
+#blocked-list::placeholder,
+#schedule-rules::placeholder {
   color: silver;
   opacity: 1;
   transition: opacity .7s;
@@ -104,7 +170,7 @@ fieldset {
     --input-background-color: #222;
   }
 
-  #blocked-container > div {
+  .content-tab.active {
     color: var(--text-color);
   }
 }
@@ -113,4 +179,5 @@ fieldset {
   #resolution-option {
     flex-direction: column;
   }
+
 }

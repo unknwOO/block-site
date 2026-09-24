@@ -34,9 +34,20 @@
     </div>
   </div>
 
-  <div id="blocked-container">
-    <div>Sites to block</div>
+  <div id="content-tabs">
+    <button type="button" class="content-tab active" data-content="blocked">Sites to block</button>
+    <button type="button" class="content-tab" data-content="schedules">Schedule</button>
+  </div>
+
+  <div id="blocked-container" class="content-panel">
     <textarea id="blocked-list" rows="10" cols="50" spellcheck="false"></textarea>
+  </div>
+
+  <div id="schedules-container" class="content-panel" hidden>
+    <div id="schedule-editor">
+      <pre id="schedule-highlight" aria-hidden="true"><code></code></pre>
+      <textarea id="schedule-rules" rows="10" cols="50" spellcheck="false"></textarea>
+    </div>
   </div>
 
   <div class="options">

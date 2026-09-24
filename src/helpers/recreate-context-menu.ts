@@ -1,6 +1,7 @@
 import storage from "../storage";
 import blockSite from "./block-site";
 import removeProtocol from "./remove-protocol";
+import isScheduleActive from "./is-schedule-active";
 
 const createContextMenu = () => {
   const parentId = chrome.contextMenus.create({
@@ -34,10 +35,12 @@ const createContextMenu = () => {
       ? removeProtocol(url)
       : new URL(url).host;
 
-    storage.get(["blocked"]).then(({ blocked }) => {
+    storage.get(["blocked", "schedule"]).then(({ blocked, schedule }) => {
       const updatedBlocked = [...blocked, blockedUrl];
       storage.set({ blocked: updatedBlocked });
-      blockSite({ blocked: updatedBlocked, tabId, url });
+      if (isScheduleActive(schedule)) {
+        blockSite({ blocked: updatedBlocked, tabId, url });
+      }
     });
   });
 };

@@ -2,16 +2,21 @@ import initStorage from "./storage/init";
 import storage from "./storage";
 import recreateContextMenu from "./helpers/recreate-context-menu";
 import blockSite from "./helpers/block-site";
+import isScheduleActive from "./helpers/is-schedule-active";
 
-let __enabled: boolean;
-let __contextMenu: boolean;
-let __blocked: string[];
+let __enabled = false;
+let __contextMenu = false;
+let __blocked: string[] = [];
+let __schedule = "";
 
 initStorage().then(() => {
-  storage.get(["enabled", "contextMenu", "blocked"]).then(({ enabled, contextMenu, blocked }) => {
+  storage.get(["enabled", "contextMenu", "blocked", "schedule"]).then(({
+    enabled, contextMenu, blocked, schedule,
+  }) => {
     __enabled = enabled;
     __contextMenu = contextMenu;
     __blocked = blocked;
+    __schedule = schedule;
 
     recreateContextMenu(__enabled && __contextMenu);
   });
@@ -32,6 +37,10 @@ initStorage().then(() => {
     if (changes["blocked"]) {
       __blocked = changes["blocked"].newValue as string[];
     }
+
+    if (changes["schedule"]) {
+      __schedule = changes["schedule"].newValue as string;
+    }
   });
 });
 
@@ -40,7 +49,7 @@ chrome.action.onClicked.addListener(() => {
 });
 
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
-  if (!__enabled || !__blocked.length) {
+  if (!__enabled || !isScheduleActive(__schedule) || !__blocked.length) {
     return;
   }
 
@@ -53,7 +62,7 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (!tabId || !__enabled || !__blocked.length) {
+  if (!tabId || !__enabled || !isScheduleActive(__schedule) || !__blocked.length) {
     return;
   }
 

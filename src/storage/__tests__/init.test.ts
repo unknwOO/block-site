@@ -15,6 +15,7 @@ test("getRevisitedSchema() returns defaults for any invalid attribute", () => {
     counterShow: DEFAULTS.counterShow,
     counterPeriod: DEFAULTS.counterPeriod,
     resolution: DEFAULTS.resolution,
+    schedule: DEFAULTS.schedule,
   } as Partial<Schema>);
 
   expect(getRevisitedSchema({
@@ -36,4 +37,5 @@ test("getRevisitedSchema() returns defaults for any invalid attribute", () => {
     blocked: DEFAULTS.blocked,
     resolution: DEFAULTS.resolution,
   } as Partial<Schema>);
+
 });
