@@ -153,12 +153,15 @@ body.settings-locked #passcode-button::after {
 }
 
 body.settings-locked :is(select:disabled, textarea:disabled) {
-  opacity: .48;
+  opacity: 1;
+  color: var(--text-color);
+  -webkit-text-fill-color: var(--text-color);
   cursor: not-allowed;
 }
 
-body.settings-locked :is(#blocked-highlight, #schedule-highlight) {
-  opacity: .48;
+body.settings-locked textarea:disabled {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 #blocked-list::placeholder,

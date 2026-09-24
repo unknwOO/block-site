@@ -1,4 +1,13 @@
-import { getPasscodeRetryDelay } from "../passcode";
+import { createEmptyPasscode, getPasscodeRetryDelay } from "../passcode";
+
+test("createEmptyPasscode() returns an unlocked passcode state", () => {
+  expect(createEmptyPasscode()).toEqual({
+    hash: "",
+    salt: "",
+    failedAttempts: 0,
+    lockedUntil: 0,
+  });
+});
 
 describe("getPasscodeRetryDelay()", () => {
   it("increases the retry delay after repeated failures", () => {

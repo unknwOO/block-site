@@ -1,4 +1,4 @@
-import type { PasscodeState } from "../helpers/passcode";
+import { createEmptyPasscode, type PasscodeState } from "../helpers/passcode";
 
 export const RESOLUTIONS = ["CLOSE_TAB", "SHOW_BLOCKED_INFO_PAGE"] as const;
 
@@ -33,12 +33,7 @@ export const DEFAULTS: Readonly<Schema> = {
   counterPeriod: "ALL_TIME",
   resolution: "CLOSE_TAB",
   schedule: "",
-  passcode: {
-    hash: "",
-    salt: "",
-    failedAttempts: 0,
-    lockedUntil: 0,
-  },
+  passcode: createEmptyPasscode(),
 };
 
 export const VALIDATORS: Readonly<

@@ -10,6 +10,7 @@ import {
   isSiteRuleLineInvalid,
 } from "./helpers/make-rules";
 import {
+  createEmptyPasscode,
   createPasscode,
   getPasscodeRetryDelay,
   type PasscodeState,
@@ -44,13 +45,7 @@ const UI = (() => {
     elements.blockedList,
     elements.scheduleRules,
   ];
-  let passcode: PasscodeState = {
-    hash: "",
-    salt: "",
-    failedAttempts: 0,
-    lockedUntil: 0,
-  };
-  let settingsUnlocked = false;
+  let passcode: PasscodeState = createEmptyPasscode();
   let passcodeMode: "setup" | "unlock" = "setup";
   let setupPasscode = "";
   let setupStep = 1;
@@ -63,7 +58,7 @@ const UI = (() => {
   const booleanToString = (b: boolean) => b ? "YES" : "NO";
   const stringToBoolean = (s: string) => s === "YES";
   const hasPasscode = () => Boolean(passcode.hash && passcode.salt);
-  const isSettingsLocked = () => hasPasscode() && !settingsUnlocked;
+  const isSettingsLocked = () => hasPasscode();
 
   const renderLockState = () => {
     const locked = isSettingsLocked();
@@ -323,7 +318,6 @@ const UI = (() => {
       await storage.set({ passcode });
       setupPasscode = "";
       checkingPasscode = false;
-      settingsUnlocked = false;
       closePasscodeDialog();
       renderLockState();
       return;
@@ -334,9 +328,8 @@ const UI = (() => {
     const matches = await verifyPasscode(value, passcode);
     checkingPasscode = false;
     if (matches) {
-      passcode = { ...passcode, failedAttempts: 0, lockedUntil: 0 };
+      passcode = createEmptyPasscode();
       await storage.set({ passcode });
-      settingsUnlocked = true;
       closePasscodeDialog();
       renderLockState();
       return;

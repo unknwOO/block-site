@@ -5,6 +5,13 @@ export type PasscodeState = {
   lockedUntil: number
 };
 
+export const createEmptyPasscode = (): PasscodeState => ({
+  hash: "",
+  salt: "",
+  failedAttempts: 0,
+  lockedUntil: 0,
+});
+
 const ITERATIONS = 600_000;
 const KEY_LENGTH = 256;
 
