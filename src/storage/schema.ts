@@ -55,12 +55,14 @@ export const VALIDATORS: Readonly<
   passcode: (value) => {
     if (!value || typeof value !== "object") return false;
     const passcode = value as PasscodeState;
-    return typeof passcode.hash === "string"
-      && typeof passcode.salt === "string"
-      && Number.isInteger(passcode.failedAttempts)
-      && passcode.failedAttempts >= 0
-      && Number.isFinite(passcode.lockedUntil)
-      && passcode.lockedUntil >= 0;
+    return (
+      typeof passcode.hash === "string" &&
+      typeof passcode.salt === "string" &&
+      Number.isInteger(passcode.failedAttempts) &&
+      passcode.failedAttempts >= 0 &&
+      Number.isFinite(passcode.lockedUntil) &&
+      passcode.lockedUntil >= 0
+    );
   },
 };
 
@@ -68,12 +70,12 @@ export const SCHEDULE_EXAMPLE = [
   "*                  # block all day",
   "",
 
-  "08:00-12:00        # block during this time",
-  "!08:00-12:00       # ! = don't block during this time",
+  "8-12               # block during this time",
+  "!08:15-12:30       # ! = don't block during this time",
   "22:00-07:00        # crosses midnight",
   "",
 
-  "# 14:00-15:00      # # = disabled rule",
+  "# 14:15-15:30      # # = disabled rule",
 ];
 
 export const BLOCKED_EXAMPLE: string[] = [
@@ -84,8 +86,8 @@ export const BLOCKED_EXAMPLE: string[] = [
 
   "!one.example.com     # ! = exclude",
   "*.example.com        # * = any zero or more characters",
+  "example.com/???/     # ? = any one character",
   "",
 
-  "example.com/???/     # ? = any one character",
-  "example.com/app/*",
+  "example.com | *, !12:00-13:00     # custom domain schedule",
 ];

@@ -1,26 +1,35 @@
 import storage from "../storage";
-import findRule from "./find-rule";
+import findRule, {
+  findCompiledRule,
+  type CompiledRule,
+} from "./find-rule";
 import * as counterHelper from "./counter";
 import getBlockedUrl from "./get-blocked-url";
+import {
+  isParsedScheduleActive,
+  type ScheduleRule,
+} from "./is-schedule-active";
 
 interface BlockSiteOptions {
   blocked: string[]
+  rules?: CompiledRule[]
+  schedule?: ScheduleRule[]
   tabId: number
   url: string
 }
 
 export default (options: BlockSiteOptions) => {
-  const { blocked, tabId, url } = options;
+  const { blocked, rules, schedule = [], tabId, url } = options;
   if (!blocked.length || !tabId || !url.startsWith("http")) {
     return;
   }
 
-  const foundRule = findRule(url, blocked);
+  const foundRule = rules ? findCompiledRule(url, rules) : findRule(url, blocked);
   if (!foundRule || foundRule.type === "allow") {
-    storage.get(["counter"]).then(({ counter }) => {
-      counterHelper.flushObsoleteEntries({ blocked, counter });
-      storage.set({ counter });
-    });
+    return;
+  }
+
+  if (!isParsedScheduleActive(foundRule.schedule ?? schedule)) {
     return;
   }
 

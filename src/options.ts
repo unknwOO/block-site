@@ -6,6 +6,10 @@ import {
   isScheduleLineInvalid,
 } from "./helpers/is-schedule-active";
 import {
+  hasInvalidSiteRules,
+  isSiteRuleLineInvalid,
+} from "./helpers/make-rules";
+import {
   createPasscode,
   getPasscodeRetryDelay,
   type PasscodeState,
@@ -17,6 +21,7 @@ const UI = (() => {
     enabled: document.getElementById("enabled") as HTMLSelectElement,
     contextMenu: document.getElementById("context-menu") as HTMLSelectElement,
     blockedList: document.getElementById("blocked-list") as HTMLTextAreaElement,
+    blockedHighlight: document.querySelector("#blocked-highlight code") as HTMLElement,
     scheduleRules: document.getElementById("schedule-rules") as HTMLTextAreaElement,
     scheduleHighlight: document.querySelector("#schedule-highlight code") as HTMLElement,
     blockedContainer: document.getElementById("blocked-container") as HTMLDivElement,
@@ -138,21 +143,43 @@ const UI = (() => {
 
   const getEventTargetValue = (event: Event) => (event.target as HTMLTextAreaElement | HTMLSelectElement).value;
   const stringToBlocked = (string: string) => string.split("\n").map((s) => s.trim()).filter(Boolean);
-  const updateScheduleValidity = (value: string) => {
-    const isInvalid = hasInvalidScheduleRules(value);
-    elements.scheduleRules.setAttribute("aria-invalid", String(isInvalid));
-
+  const updateEditorValidity = (
+    value: string,
+    textarea: HTMLTextAreaElement,
+    highlight: HTMLElement,
+    hasInvalidRules: (source: string) => boolean,
+    isLineInvalid: (line: string) => boolean,
+  ) => {
+    textarea.setAttribute("aria-invalid", String(hasInvalidRules(value)));
     const lines = value.split("\n");
     const fragments = lines.flatMap((line, index) => {
       const span = document.createElement("span");
-      span.classList.toggle("invalid", isScheduleLineInvalid(line));
+      span.classList.toggle("invalid", isLineInvalid(line));
       span.textContent = line;
       return index < lines.length - 1 ? [span, document.createTextNode("\n")] : [span];
     });
-    elements.scheduleHighlight.replaceChildren(...fragments);
+    highlight.replaceChildren(...fragments);
   };
-  const syncScheduleScroll = () => {
-    elements.scheduleHighlight.style.transform = `translate(${-elements.scheduleRules.scrollLeft}px, ${-elements.scheduleRules.scrollTop}px)`;
+  const updateBlockedValidity = (value: string) => {
+    updateEditorValidity(
+      value,
+      elements.blockedList,
+      elements.blockedHighlight,
+      hasInvalidSiteRules,
+      isSiteRuleLineInvalid,
+    );
+  };
+  const updateScheduleValidity = (value: string) => {
+    updateEditorValidity(
+      value,
+      elements.scheduleRules,
+      elements.scheduleHighlight,
+      hasInvalidScheduleRules,
+      isScheduleLineInvalid,
+    );
+  };
+  const syncEditorScroll = (textarea: HTMLTextAreaElement, highlight: HTMLElement) => {
+    highlight.style.transform = `translate(${-textarea.scrollLeft}px, ${-textarea.scrollTop}px)`;
   };
 
   const showContent = (content: string) => {
@@ -181,8 +208,13 @@ const UI = (() => {
 
   elements.blockedList.addEventListener("input", (event) => {
     if (isSettingsLocked()) return;
-    const blocked = stringToBlocked(getEventTargetValue(event));
+    const value = getEventTargetValue(event);
+    const blocked = stringToBlocked(value);
+    updateBlockedValidity(value);
     storage.set({ blocked });
+  });
+  elements.blockedList.addEventListener("scroll", () => {
+    syncEditorScroll(elements.blockedList, elements.blockedHighlight);
   });
 
   elements.scheduleRules.addEventListener("input", (event) => {
@@ -191,7 +223,9 @@ const UI = (() => {
     updateScheduleValidity(schedule);
     storage.set({ schedule });
   });
-  elements.scheduleRules.addEventListener("scroll", syncScheduleScroll);
+  elements.scheduleRules.addEventListener("scroll", () => {
+    syncEditorScroll(elements.scheduleRules, elements.scheduleHighlight);
+  });
 
   elements.resolution.addEventListener("change", (event) => {
     const resolution = getEventTargetValue(event) as Resolution;
@@ -222,6 +256,7 @@ const UI = (() => {
       if (JSON.stringify(valueAsBlocked) !== JSON.stringify(items.blocked)) {
         elements.blockedList.value = items.blocked.join("\r\n");
       }
+      updateBlockedValidity(elements.blockedList.value);
     }
 
     if (

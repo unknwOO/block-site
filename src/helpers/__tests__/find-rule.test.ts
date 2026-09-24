@@ -1,7 +1,20 @@
-import findRule from "../find-rule";
+import findRule, { compileRules, findCompiledRule } from "../find-rule";
 import { Rule } from "../make-rules";
 
 describe("findRule()", () => {
+  it("reuses compiled rules with per-site schedules", () => {
+    const rules = compileRules(["instagram.com | 8-10, 14-16"]);
+
+    expect(findCompiledRule("https://instagram.com/reels", rules)).toMatchObject({
+      type: "block",
+      path: "instagram.com",
+      schedule: [
+        { type: "block", start: 480, end: 600 },
+        { type: "block", start: 840, end: 960 },
+      ],
+    });
+  });
+
   describe("empty URL and/or empty blocked", () => {
     it("returns undefined", () => {
       expect(findRule("", [])).toBeUndefined();

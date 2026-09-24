@@ -2,12 +2,14 @@ import initStorage from "./storage/init";
 import storage from "./storage";
 import recreateContextMenu from "./helpers/recreate-context-menu";
 import blockSite from "./helpers/block-site";
-import isScheduleActive from "./helpers/is-schedule-active";
+import { compileRules, type CompiledRule } from "./helpers/find-rule";
+import { parseSchedule, type ScheduleRule } from "./helpers/is-schedule-active";
 
 let __enabled = false;
 let __contextMenu = false;
 let __blocked: string[] = [];
-let __schedule = "";
+let __rules: CompiledRule[] = [];
+let __schedule: ScheduleRule[] = [];
 
 initStorage().then(() => {
   storage.get(["enabled", "contextMenu", "blocked", "schedule"]).then(({
@@ -16,7 +18,8 @@ initStorage().then(() => {
     __enabled = enabled;
     __contextMenu = contextMenu;
     __blocked = blocked;
-    __schedule = schedule;
+    __rules = compileRules(blocked);
+    __schedule = parseSchedule(schedule);
 
     recreateContextMenu(__enabled && __contextMenu);
   });
@@ -36,10 +39,11 @@ initStorage().then(() => {
 
     if (changes["blocked"]) {
       __blocked = changes["blocked"].newValue as string[];
+      __rules = compileRules(__blocked);
     }
 
     if (changes["schedule"]) {
-      __schedule = changes["schedule"].newValue as string;
+      __schedule = parseSchedule(changes["schedule"].newValue as string);
     }
   });
 });
@@ -49,7 +53,7 @@ chrome.action.onClicked.addListener(() => {
 });
 
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
-  if (!__enabled || !isScheduleActive(__schedule) || !__blocked.length) {
+  if (!__enabled || !__blocked.length) {
     return;
   }
 
@@ -58,11 +62,11 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
     return;
   }
 
-  blockSite({ blocked: __blocked, tabId, url });
+  blockSite({ blocked: __blocked, rules: __rules, schedule: __schedule, tabId, url });
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (!tabId || !__enabled || !isScheduleActive(__schedule) || !__blocked.length) {
+  if (!tabId || !__enabled || !__blocked.length) {
     return;
   }
 
@@ -71,5 +75,5 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
     return;
   }
 
-  blockSite({ blocked: __blocked, tabId, url });
+  blockSite({ blocked: __blocked, rules: __rules, schedule: __schedule, tabId, url });
 });

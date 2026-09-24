@@ -1,4 +1,4 @@
-type ScheduleRule = {
+export type ScheduleRule = {
   type: "block" | "allow" | "block-all"
   start?: number
   end?: number
@@ -69,12 +69,7 @@ const contains = ({ start, end }: ScheduleRule, currentTime: number) => {
   return currentTime >= start || currentTime < end;
 };
 
-export default (source: string, now = new Date()) => {
-  if (!source.trim()) {
-    return true;
-  }
-
-  const rules = parseSchedule(source);
+export const isParsedScheduleActive = (rules: ScheduleRule[], now = new Date()) => {
   if (!rules.length) {
     return true;
   }
@@ -88,3 +83,7 @@ export default (source: string, now = new Date()) => {
 
   return isBlocked && !isAllowed;
 };
+
+export default (source: string, now = new Date()) => (
+  isParsedScheduleActive(parseSchedule(source), now)
+);

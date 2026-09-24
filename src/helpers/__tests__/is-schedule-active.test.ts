@@ -1,5 +1,6 @@
 import isScheduleActive, {
   hasInvalidScheduleRules,
+  isParsedScheduleActive,
   isScheduleLineInvalid,
   parseSchedule,
 } from "../is-schedule-active";
@@ -62,6 +63,14 @@ describe("isScheduleActive()", () => {
 
     expect(isScheduleActive(rules, new Date("2026-09-24T10:00:00Z"))).toBe(false);
     expect(isScheduleActive(rules, new Date("2026-09-24T14:00:00Z"))).toBe(true);
+  });
+
+  it("ignores rule order", () => {
+    const now = new Date("2026-09-24T10:00:00Z");
+
+    expect(isScheduleActive("*\n!8-12", now)).toBe(false);
+    expect(isScheduleActive("!8-12\n*", now)).toBe(false);
+    expect(isParsedScheduleActive(parseSchedule("*\n!8-12"), now)).toBe(false);
   });
 
   it("stays active when the source contains no valid rules", () => {

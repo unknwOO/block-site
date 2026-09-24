@@ -1,6 +1,10 @@
 import removeProtocol from "./remove-protocol";
 import makeRules, { Rule } from "./make-rules";
 
+export interface CompiledRule extends Rule {
+  patterns: RegExp[]
+}
+
 const expandPath = (path: string) => {
   const expanded = [path];
   if (!["*.", "www."].find((prefix) => path.startsWith(prefix))) {
@@ -16,12 +20,10 @@ const expandPath = (path: string) => {
   return expanded;
 };
 
-export default (url: string, blocked: string[]): Rule | undefined => {
-  const normalizedUrl = removeProtocol(url);
-  const rules = makeRules(blocked);
-
-  const foundRule = rules.find(({ path }) => {
-    const patterns = expandPath(path)
+export const compileRules = (blocked: string[]): CompiledRule[] => (
+  makeRules(blocked).map((rule) => ({
+    ...rule,
+    patterns: expandPath(rule.path)
       .map((path) => path.replace(/[.+]/g, "\\$&")) // escape regex characters
       .map((path) => (
         "^"
@@ -29,15 +31,23 @@ export default (url: string, blocked: string[]): Rule | undefined => {
           .replace(/\?/g, ".")   // user can type "?" to match any one character
           .replace(/\*/g, ".*")  // user can type "*" to match any zero or more characters
         + "$"
-      ));
+      ))
+      .map((pattern) => new RegExp(pattern)),
+  }))
+);
 
-    const found = patterns.some((pattern) => {
-      const matches = normalizedUrl.match(new RegExp(pattern));
-      return matches;
-    });
+export const findCompiledRule = (url: string, rules: CompiledRule[]) => {
+  const normalizedUrl = removeProtocol(url);
+  return rules.find(({ patterns }) => (
+    patterns.some((pattern) => normalizedUrl.match(pattern))
+  ));
+};
 
-    return found;
-  });
+export default (url: string, blocked: string[]): Rule | undefined => {
+  const foundRule = findCompiledRule(url, compileRules(blocked));
+  if (!foundRule) return undefined;
 
-  return foundRule;
+  return foundRule.schedule === undefined
+    ? { type: foundRule.type, path: foundRule.path }
+    : { type: foundRule.type, path: foundRule.path, schedule: foundRule.schedule };
 };
