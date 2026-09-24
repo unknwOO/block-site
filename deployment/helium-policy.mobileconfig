@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadContent</key>
+			<dict>
+				<key>net.imput.helium</key>
+				<dict>
+					<key>Forced</key>
+					<array>
+						<dict>
+							<key>mcx_preference_settings</key>
+							<dict>
+								<key>DeveloperToolsAvailability</key>
+								<integer>0</integer>
+								<key>ExtensionSettings</key>
+								<dict>
+									<key>EXTENSION_ID_TO_REPLACE</key>
+									<dict>
+										<key>installation_mode</key>
+										<string>force_installed</string>
+										<key>update_url</key>
+										<string>https://clients2.google.com/service/update2/crx</string>
+									</dict>
+								</dict>
+							</dict>
+						</dict>
+					</array>
+				</dict>
+			</dict>
+			<key>PayloadDisplayName</key>
+			<string>Helium Focus Policy</string>
+			<key>PayloadIdentifier</key>
+			<string>com.maxime.helium.focus-policy.managed-preferences</string>
+			<key>PayloadType</key>
+			<string>com.apple.ManagedClient.preferences</string>
+			<key>PayloadUUID</key>
+			<string>611C548A-CE29-4A1B-8F6C-0BC61090AB6A</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>PayloadDescription</key>
+	<string>Force-installs Focus in Helium and disables DevTools for policy-installed extensions.</string>
+	<key>PayloadDisplayName</key>
+	<string>Helium Focus Policy</string>
+	<key>PayloadIdentifier</key>
+	<string>com.maxime.helium.focus-policy</string>
+	<key>PayloadOrganization</key>
+	<string>Maxime</string>
+	<key>PayloadScope</key>
+	<string>System</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>D2479A0D-3EE0-4AE3-B913-2FF8C40D4F07</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

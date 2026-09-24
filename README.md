@@ -1,13 +1,10 @@
-# Block Site
+# Focus
 
-**Block Site** is a simple **Chrome/Firefox extension** that improves your productivity by blocking access to distracting websites as you specify.
+**Focus** blocks distracting websites and protects its settings with a passcode.
 
 ## Icon
 
 <img src="public/icon_128.png" width="48">
-
-<img src="public/toolbar/light.png" width="480">
-<img src="public/toolbar/dark.png" width="480">
 
 ## Usage
 
@@ -59,11 +56,7 @@ example.com/*rry/*       # Blocks e.g.:
 
 ### Context menu
 
-If enabled, Block Site will be added to your browser's context menu. It will offer options to:
+If enabled, Focus will be added to your browser's context menu. It will offer options to:
+
 - Block this page only
 - Block entire website
-
-## Privacy notice
-
-Block Site doesn't collect any personal information or data.
-Any user settings are stored in your browser only.

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Block Site",
-  "description": "Blocks access to distracting websites to improve your productivity.",
-  "version": "8.2.1",
+  "name": "Focus",
+  "description": "Block distracting websites and protect your settings with a passcode.",
+  "version": "1.0.0",
   "icons": {
     "32": "icon_32.png",
     "128": "icon_128.png"
@@ -30,7 +30,7 @@
   "incognito": "spanning",
   "browser_specific_settings": {
     "gecko": {
-      "id": "{5D2A6F66-7AC0-6750-AFBA-1DA7C98A3086}"
+      "id": "{05FA41BD-D1D7-4A02-BCFF-F313267B8294}"
     }
   }
 }

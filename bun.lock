@@ -3,7 +3,7 @@
   "configVersion": 0,
   "workspaces": {
     "": {
-      "name": "block-site",
+      "name": "focus",
       "dependencies": {
         "dayjs": "^1.11.10",
       },

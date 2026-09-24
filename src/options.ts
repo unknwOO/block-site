@@ -10,12 +10,10 @@ import {
   isSiteRuleLineInvalid,
 } from "./helpers/make-rules";
 import {
-  createEmptyPasscode,
-  createPasscode,
-  getPasscodeRetryDelay,
-  type PasscodeState,
-  verifyPasscode,
-} from "./helpers/passcode";
+  type PasscodeLockState,
+  type ProtectedSettingKey,
+} from "./helpers/protected-settings";
+import { sendSettingsMessage } from "./helpers/settings-messages";
 
 const UI = (() => {
   const elements = {
@@ -45,7 +43,11 @@ const UI = (() => {
     elements.blockedList,
     elements.scheduleRules,
   ];
-  let passcode: PasscodeState = createEmptyPasscode();
+  let passcode: PasscodeLockState = {
+    hasPasscode: false,
+    failedAttempts: 0,
+    lockedUntil: 0,
+  };
   let passcodeMode: "setup" | "unlock" = "setup";
   let setupPasscode = "";
   let setupStep = 1;
@@ -57,8 +59,15 @@ const UI = (() => {
 
   const booleanToString = (b: boolean) => b ? "YES" : "NO";
   const stringToBoolean = (s: string) => s === "YES";
-  const hasPasscode = () => Boolean(passcode.hash && passcode.salt);
-  const isSettingsLocked = () => hasPasscode();
+  const isSettingsLocked = () => passcode.hasPasscode;
+
+  const setProtectedSetting = <K extends ProtectedSettingKey>(key: K, value: Schema[K]) => {
+    void sendSettingsMessage({
+      type: "SET_PROTECTED_SETTING",
+      key,
+      value,
+    });
+  };
 
   const renderLockState = () => {
     const locked = isSettingsLocked();
@@ -192,13 +201,13 @@ const UI = (() => {
   elements.enabled.addEventListener("change", (event) => {
     if (isSettingsLocked()) return;
     const enabled = stringToBoolean(getEventTargetValue(event));
-    storage.set({ enabled });
+    setProtectedSetting("enabled", enabled);
   });
 
   elements.contextMenu.addEventListener("change", (event) => {
     if (isSettingsLocked()) return;
     const contextMenu = stringToBoolean(getEventTargetValue(event));
-    storage.set({ contextMenu });
+    setProtectedSetting("contextMenu", contextMenu);
   });
 
   elements.blockedList.addEventListener("input", (event) => {
@@ -206,7 +215,7 @@ const UI = (() => {
     const value = getEventTargetValue(event);
     const blocked = stringToBlocked(value);
     updateBlockedValidity(value);
-    storage.set({ blocked });
+    setProtectedSetting("blocked", blocked);
   });
   elements.blockedList.addEventListener("scroll", () => {
     syncEditorScroll(elements.blockedList, elements.blockedHighlight);
@@ -216,7 +225,7 @@ const UI = (() => {
     if (isSettingsLocked()) return;
     const schedule = getEventTargetValue(event);
     updateScheduleValidity(schedule);
-    storage.set({ schedule });
+    setProtectedSetting("schedule", schedule);
   });
   elements.scheduleRules.addEventListener("scroll", () => {
     syncEditorScroll(elements.scheduleRules, elements.scheduleHighlight);
@@ -282,10 +291,6 @@ const UI = (() => {
       elements.counterPeriod.value = items.counterPeriod;
     }
 
-    if (items.passcode !== undefined) {
-      passcode = items.passcode;
-      renderLockState();
-    }
   };
 
   const submitPasscode = async () => {
@@ -314,8 +319,8 @@ const UI = (() => {
 
       checkingPasscode = true;
       setPasscodeInputsDisabled(true);
-      passcode = await createPasscode(value);
-      await storage.set({ passcode });
+      const response = await sendSettingsMessage({ type: "SET_PASSCODE", passcode: value });
+      passcode = response.lockState;
       setupPasscode = "";
       checkingPasscode = false;
       closePasscodeDialog();
@@ -325,24 +330,15 @@ const UI = (() => {
 
     checkingPasscode = true;
     setPasscodeInputsDisabled(true);
-    const matches = await verifyPasscode(value, passcode);
+    const response = await sendSettingsMessage({ type: "UNLOCK_SETTINGS", passcode: value });
     checkingPasscode = false;
-    if (matches) {
-      passcode = createEmptyPasscode();
-      await storage.set({ passcode });
+    passcode = response.lockState;
+    if (response.success) {
       closePasscodeDialog();
       renderLockState();
       return;
     }
 
-    const failedAttempts = passcode.failedAttempts + 1;
-    const delay = getPasscodeRetryDelay(failedAttempts);
-    passcode = {
-      ...passcode,
-      failedAttempts,
-      lockedUntil: delay ? Date.now() + delay : 0,
-    };
-    await storage.set({ passcode });
     clearPasscodeInputs();
     showFailedAttempts();
   };
@@ -384,7 +380,12 @@ const UI = (() => {
     });
   });
 
-  return { elements, init };
+  const setLockState = (state: PasscodeLockState) => {
+    passcode = state;
+    renderLockState();
+  };
+
+  return { elements, init, setLockState };
 })();
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -396,10 +397,10 @@ window.addEventListener("DOMContentLoaded", () => {
     "counterShow",
     "counterPeriod",
     "schedule",
-    "passcode",
   ];
 
-  storage.get(keys).then((local) => {
+  Promise.all([storage.get(keys), sendSettingsMessage({ type: "GET_LOCK_STATE" })]).then(([local, response]) => {
+    UI.setLockState(response.lockState);
     UI.init(local);
     document.body.classList.add("ready");
   });
@@ -410,5 +411,10 @@ window.addEventListener("DOMContentLoaded", () => {
         UI.init({ [key]: changes[key].newValue });
       }
     });
+    if (changes.passcode) {
+      void sendSettingsMessage({ type: "GET_LOCK_STATE" }).then((response) => {
+        UI.setLockState(response.lockState);
+      });
+    }
   });
 });

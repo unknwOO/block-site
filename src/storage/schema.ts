@@ -41,7 +41,8 @@ export const VALIDATORS: Readonly<
 > = {
   enabled: (value) => typeof value === "boolean",
   contextMenu: (value) => typeof value === "boolean",
-  blocked: (value) => Array.isArray(value),
+  blocked: (value) =>
+    Array.isArray(value) && value.every((item) => typeof item === "string"),
   counter: (value) => typeof value === "object",
   counterShow: (value) => typeof value === "boolean",
   counterPeriod: (value) => COUNTER_PERIODS.includes(value as CounterPeriod),
@@ -84,5 +85,6 @@ export const BLOCKED_EXAMPLE: string[] = [
   "example.com/???/     # ? = any one character",
   "",
 
-  "example.com | *, !12:00-13:00     # custom domain schedule",
+  "example.com | 7-18                # override global schedule",
+  "example.com | *, !12:00-13:00     # other domain's custom schedule",
 ];

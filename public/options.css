@@ -42,7 +42,7 @@ body:not(.counter-show) #counter-period-option {
   width: .18em;
   height: .18em;
   border-radius: 50%;
-  background: #F00;
+  background: #9D32FF;
   transform: translateX(-50%);
 }
 

@@ -10,7 +10,7 @@ import {
   type ScheduleRule,
 } from "./is-schedule-active";
 
-interface BlockSiteOptions {
+interface BlockUrlOptions {
   blocked: string[]
   rules?: CompiledRule[]
   schedule?: ScheduleRule[]
@@ -18,7 +18,7 @@ interface BlockSiteOptions {
   url: string
 }
 
-export default (options: BlockSiteOptions) => {
+export default (options: BlockUrlOptions) => {
   const { blocked, rules, schedule = [], tabId, url } = options;
   if (!blocked.length || !tabId || !url.startsWith("http")) {
     return;
