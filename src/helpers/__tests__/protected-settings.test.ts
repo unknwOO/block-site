@@ -41,6 +41,43 @@ test("protected settings can change only while unlocked", async () => {
   expect(locked.write).not.toHaveBeenCalled();
 });
 
+test("context menu rules can be added while settings are locked", async () => {
+  const { controller, write } = createController(lockedPasscode);
+
+  await expect(controller.addBlockedRule("example.com")).resolves.toEqual([
+    "youtube.com",
+    "example.com",
+  ]);
+  expect(write).toHaveBeenCalledWith({
+    blocked: ["youtube.com", "example.com"],
+  });
+});
+
+test("context menu additions cannot create allow rules", async () => {
+  const { controller, write } = createController(lockedPasscode);
+
+  await expect(controller.addBlockedRule("!youtube.com")).resolves.toBeUndefined();
+  expect(write).not.toHaveBeenCalled();
+});
+
+test("concurrent context menu additions preserve every rule", async () => {
+  const { controller, write } = createController(lockedPasscode);
+
+  await Promise.all([
+    controller.addBlockedRule("example.com"),
+    controller.addBlockedRule("news.example.com"),
+  ]);
+
+  expect(controller.getSettings().blocked).toEqual([
+    "youtube.com",
+    "example.com",
+    "news.example.com",
+  ]);
+  expect(write).toHaveBeenLastCalledWith({
+    blocked: ["youtube.com", "example.com", "news.example.com"],
+  });
+});
+
 test("direct storage changes are restored from trusted memory", async () => {
   const { controller, write } = createController(lockedPasscode);
 

@@ -64,6 +64,21 @@ export class ProtectedSettingsController {
     });
   }
 
+  public async addBlockedRule(rule: string) {
+    return this.runExclusive(async () => {
+      const normalizedRule = rule.trim();
+      if (!normalizedRule || normalizedRule.startsWith("!")) return undefined;
+
+      if (this.settings.blocked.includes(normalizedRule)) {
+        return [...this.settings.blocked];
+      }
+
+      const blocked = [...this.settings.blocked, normalizedRule];
+      await this.write({ blocked });
+      return blocked;
+    });
+  }
+
   public async setPasscode(passcode: string) {
     return this.runExclusive(async () => {
       if (hasPasscode(this.settings.passcode) || !/^\d{4}$/.test(passcode)) return false;

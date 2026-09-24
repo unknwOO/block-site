@@ -1,3 +1,7 @@
+h1 {
+  margin-left: 0;
+}
+
 #url, #rule {
   font-family: monospace;
   padding: var(--border-radius);

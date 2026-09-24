@@ -24,6 +24,11 @@ test("context menu rebuilds run sequentially", async () => {
   removeCallbacks.shift()?.();
   await flushPromises();
   expect(create).toHaveBeenCalledTimes(3);
+  expect(create.mock.calls.slice(0, 3).map(([options]) => options.id)).toEqual([
+    "block_site",
+    "block_all",
+    "block_one",
+  ]);
   expect(removeCallbacks).toHaveLength(1);
 
   removeCallbacks.shift()?.();

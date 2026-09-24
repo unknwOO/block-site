@@ -31,14 +31,14 @@ const createContextMenu = () => {
 
   chrome.contextMenus.create({
     parentId,
-    id: blockOneId,
-    title: "Block this page only",
+    id: blockAllId,
+    title: "Block entire website",
   });
 
   chrome.contextMenus.create({
     parentId,
-    id: blockAllId,
-    title: "Block entire website",
+    id: blockOneId,
+    title: "Block this page only",
   });
 
   if (!listenerRegistered) {

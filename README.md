@@ -58,5 +58,5 @@ example.com/*rry/*       # Blocks e.g.:
 
 If enabled, Focus will be added to your browser's context menu. It will offer options to:
 
-- Block this page only
 - Block entire website
+- Block this page only

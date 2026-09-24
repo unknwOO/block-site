@@ -28,8 +28,8 @@ let __settingsController: ProtectedSettingsController;
 
 const handleContextMenuBlock = async (blockedUrl: string, tabId: number, url: string) => {
   const settings = __settingsController.getSettings();
-  const blocked = [...settings.blocked, blockedUrl];
-  if (!await __settingsController.setSetting("blocked", blocked)) return;
+  const blocked = await __settingsController.addBlockedRule(blockedUrl);
+  if (!blocked) return;
 
   if (isParsedScheduleActive(parseSchedule(settings.schedule))) {
     blockUrl({ blocked, tabId, url });
