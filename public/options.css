@@ -11,6 +11,45 @@ body:not(.counter-show) #counter-period-option {
   display: none;
 }
 
+#passcode-button {
+  display: flex;
+  flex: 0 0 auto;
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  margin-right: 10px;
+}
+
+#passcode-button:focus-visible {
+  outline: 3px solid var(--border-color);
+  outline-offset: 2px;
+}
+
+#passcode-button img {
+  width: 1em;
+  height: auto;
+}
+
+#passcode-button::after {
+  content: "";
+  display: none;
+  position: absolute;
+  left: 50%;
+  bottom: -.32em;
+  width: .18em;
+  height: .18em;
+  border-radius: 50%;
+  background: #F00;
+  transform: translateX(-50%);
+}
+
+body.settings-locked #passcode-button::after {
+  display: block;
+}
+
 #content-tabs {
   display: flex;
   margin-top: 1em;
@@ -109,6 +148,15 @@ body:not(.counter-show) #counter-period-option {
   color: red;
 }
 
+body.settings-locked :is(select:disabled, textarea:disabled) {
+  opacity: .48;
+  cursor: not-allowed;
+}
+
+body.settings-locked #schedule-highlight {
+  opacity: .48;
+}
+
 #blocked-list::placeholder,
 #schedule-rules::placeholder {
   color: silver;
@@ -164,20 +212,128 @@ fieldset {
   padding: 6px;
 }
 
+#passcode-dialog {
+  width: min(420px, calc(100vw - 32px));
+  padding: 0;
+  border: 3px solid var(--border-color);
+  border-radius: calc(var(--border-radius) * 2);
+  outline: none;
+  background: var(--input-background-color);
+  color: var(--text-color);
+}
+
+#passcode-dialog::backdrop {
+  background: rgba(0, 0, 0, .45);
+}
+
+#passcode-dialog-body {
+  display: grid;
+  grid-template-rows: auto auto 1.05em;
+  align-content: start;
+  justify-items: center;
+  row-gap: 6px;
+  padding: 28px 28px 0;
+}
+
+#passcode-inputs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: calc(1.05em + 6px);
+}
+
+#passcode-inputs input {
+  width: 56px;
+  height: 68px;
+  border: 3px solid silver;
+  border-radius: calc(var(--border-radius) * 2);
+  outline: none;
+  background: var(--input-background-color);
+  color: var(--text-color);
+  caret-color: transparent;
+  font-size: 1.7em;
+  text-align: center;
+}
+
+#passcode-inputs input:focus {
+  border-color: var(--border-color);
+}
+
+#passcode-inputs input:disabled {
+  opacity: .5;
+}
+
+#passcode-prompt {
+  margin: 0;
+  text-align: center;
+}
+
+#passcode-error {
+  align-self: center;
+  height: auto;
+  margin: 0;
+  color: red;
+  font-size: .7em;
+  font-weight: bold;
+  text-align: center;
+  transform: translateY(-.5em);
+}
+
+#passcode-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 28px 28px;
+}
+
+#passcode-close {
+  border: 3px solid black;
+  border-radius: var(--border-radius);
+  background: black;
+  color: white;
+  cursor: pointer;
+  font-size: 1.15em;
+  font-weight: bold;
+  width: 100%;
+  padding: .5em 1.35em;
+  text-align: center;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --border-color: #222;
+    --border-color: white;
     --input-background-color: #222;
   }
 
   .content-tab.active {
-    color: var(--text-color);
+    color: var(--input-background-color);
+  }
+
+  #passcode-inputs input {
+    border-color: #777;
+  }
+
+  #passcode-inputs input:focus {
+    border-color: white;
+  }
+
+  #passcode-close {
+    border-color: white;
+    background: white;
+    color: var(--input-background-color);
   }
 }
 
 @media only screen and (max-width: 800px) {
   #resolution-option {
     flex-direction: column;
+  }
+
+  #passcode-inputs {
+    gap: 8px;
+  }
+
+  #passcode-inputs input {
+    width: 52px;
+    height: 70px;
   }
 
 }

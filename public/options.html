@@ -12,7 +12,9 @@
 
 <body>
   <h1>
-    <img src="icon_128.png">
+    <button id="passcode-button" type="button" aria-label="Set passcode" title="Set passcode">
+      <img src="icon_128.png">
+    </button>
     <span>Block Site</span>
   </h1>
 
@@ -81,6 +83,22 @@
       </div>
     </div>
   </div>
+
+  <dialog id="passcode-dialog">
+    <div id="passcode-dialog-body">
+      <div id="passcode-inputs" aria-label="Four-digit passcode">
+        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Digit 1">
+        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Digit 2">
+        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Digit 3">
+        <input type="text" inputmode="numeric" maxlength="1" autocomplete="off" aria-label="Digit 4">
+      </div>
+      <p id="passcode-prompt">Enter Screen Time passcode</p>
+      <p id="passcode-error" aria-live="polite"></p>
+    </div>
+    <div id="passcode-dialog-footer">
+      <button id="passcode-close" type="button">Close</button>
+    </div>
+  </dialog>
 
 </body>
 

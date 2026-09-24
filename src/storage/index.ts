@@ -17,6 +17,7 @@ const getAll = () => get([
   "counterPeriod",
   "resolution",
   "schedule",
+  "passcode",
 ]);
 
 export default {

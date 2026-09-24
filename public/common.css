@@ -52,7 +52,7 @@ a:hover {
 @media (prefers-color-scheme: dark) {
   :root {
     --background-color: #121212;
-    --text-color: #bcbcbc;
+    --text-color: white;
   }
 
   h1 > img {

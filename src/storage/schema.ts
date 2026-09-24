@@ -1,3 +1,5 @@
+import type { PasscodeState } from "../helpers/passcode";
+
 export const RESOLUTIONS = ["CLOSE_TAB", "SHOW_BLOCKED_INFO_PAGE"] as const;
 
 export const COUNTER_PERIODS = [
@@ -19,6 +21,7 @@ export interface Schema {
   counterPeriod: CounterPeriod;
   resolution: Resolution;
   schedule: string;
+  passcode: PasscodeState;
 }
 
 export const DEFAULTS: Readonly<Schema> = {
@@ -30,6 +33,12 @@ export const DEFAULTS: Readonly<Schema> = {
   counterPeriod: "ALL_TIME",
   resolution: "CLOSE_TAB",
   schedule: "",
+  passcode: {
+    hash: "",
+    salt: "",
+    failedAttempts: 0,
+    lockedUntil: 0,
+  },
 };
 
 export const VALIDATORS: Readonly<
@@ -43,6 +52,16 @@ export const VALIDATORS: Readonly<
   counterPeriod: (value) => COUNTER_PERIODS.includes(value as CounterPeriod),
   resolution: (value) => RESOLUTIONS.includes(value as Resolution),
   schedule: (value) => typeof value === "string",
+  passcode: (value) => {
+    if (!value || typeof value !== "object") return false;
+    const passcode = value as PasscodeState;
+    return typeof passcode.hash === "string"
+      && typeof passcode.salt === "string"
+      && Number.isInteger(passcode.failedAttempts)
+      && passcode.failedAttempts >= 0
+      && Number.isFinite(passcode.lockedUntil)
+      && passcode.lockedUntil >= 0;
+  },
 };
 
 export const SCHEDULE_EXAMPLE = [
